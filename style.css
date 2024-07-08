@@ -1,0 +1,28 @@
+:root {
+    --grid-rows: 10;
+    --grid-cols: 10;
+}
+
+#grid {
+    display: grid;
+    border: 1px solid black;
+    grid-template-rows: repeat(var(--grid-rows), 1fr);
+    grid-template-columns: repeat(var(--grid-cols), 1fr);
+    width: 400px;
+    height: 400px;
+}
+
+.grid-item {
+    border: 1px solid black;
+    background-color: lightgray;
+}
+
+.grid-item-start {
+    border: 1px solid black;
+    background-color: green;
+}
+
+.grid-item-finish {
+    border: 1px solid black;
+    background-color: red;
+}
