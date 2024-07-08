@@ -1,14 +1,10 @@
-
+import Node from './Node.js';
 
 const grid = document.getElementById('grid');
 const gridArray = []
 
 const NUM_OF_ROWS = 10;
 const NUM_OF_COLS = 10;
-
-class Node {
-
-}
 
 function makeGrid(rows, cols) {
     grid.style.setProperty('--grid-rows', rows);
@@ -21,20 +17,19 @@ function makeGrid(rows, cols) {
             const gridItem = document.createElement('div');
             gridItem.classList.add('grid-item');
             grid.appendChild(gridItem);
-            gridArray[row].push(gridItem);
+            gridArray[row].push(new Node(gridItem));
         }
     }
 }
 
 function setStartNode(row, col) {
-    gridArray[row][col].classList.add('grid-item-start');
+    gridArray[row][col].setStart();
 }
 
 function setFinishNode(row, col) {
-    gridArray[row][col].classList.add('grid-item-finish');
+    gridArray[row][col].setFinish();
 }
 
 makeGrid(NUM_OF_ROWS, NUM_OF_COLS);
-console.log(gridArray);
 setStartNode(0, 0);
 setFinishNode(9, 9);
