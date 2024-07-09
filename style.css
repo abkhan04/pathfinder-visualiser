@@ -12,17 +12,22 @@
     height: 400px;
 }
 
-.grid-item {
+.node {
     border: 1px solid black;
     background-color: lightgray;
 }
 
-.grid-item-start {
+.node-start {
     border: 1px solid black;
     background-color: green;
 }
 
-.grid-item-finish {
+.node-finish {
     border: 1px solid black;
     background-color: red;
+}
+
+.node-wall {
+    border: 1px solid black;
+    background-color: black;
 }
