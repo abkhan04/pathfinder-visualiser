@@ -31,3 +31,8 @@
     border: 1px solid black;
     background-color: black;
 }
+
+.node-visited {
+    border: 1px solid black;
+    background-color: blue;   
+}

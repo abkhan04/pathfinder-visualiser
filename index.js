@@ -6,7 +6,6 @@ const gridArray = [];
 const NUM_OF_ROWS = 10;
 const NUM_OF_COLS = 10;
 
-
 function makeGrid(rows, cols) {
     grid.style.setProperty('--grid-rows', rows);
     grid.style.setProperty('--grid-cols', cols);
