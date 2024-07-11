@@ -3,7 +3,7 @@
     --grid-cols: 10;
 }
 
-#grid {
+#container {
     display: grid;
     border: 1px solid black;
     grid-template-rows: repeat(var(--grid-rows), 1fr);
@@ -12,27 +12,27 @@
     height: 400px;
 }
 
-.node {
+.cell {
     border: 1px solid black;
     background-color: lightgray;
 }
 
-.node-start {
+.cell-start {
     border: 1px solid black;
     background-color: green;
 }
 
-.node-finish {
+.cell-finish {
     border: 1px solid black;
     background-color: red;
 }
 
-.node-wall {
+.cell-wall {
     border: 1px solid black;
     background-color: black;
 }
 
-.node-visited {
+.cell-visited {
     border: 1px solid black;
     background-color: blue;   
 }

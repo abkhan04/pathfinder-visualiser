@@ -1,25 +1,127 @@
-import Node from './Node.js';
+const container = document.getElementById('container');
+let grid = [];
 
-const grid = document.getElementById('grid');
-const gridArray = [];
+const ROWS = 10;
+const COLS = 10;
 
-const NUM_OF_ROWS = 10;
-const NUM_OF_COLS = 10;
+let startNode = [];
+let finishNode = [];
 
-function makeGrid(rows, cols) {
-    grid.style.setProperty('--grid-rows', rows);
-    grid.style.setProperty('--grid-cols', cols);
+class Cell {
+    constructor(element, x, y) {
+        this.element = element;
+        this.x = x;
+        this.y = y;
+        this.neighbours = [];
+        this.addNeighbours();
+        this.start = false;
+        this.finish = false;
+        this.wall = false;
+        this.visited = false;
+        this.addClickEvent();
+        this.addMouseEnterEvent();
+    }
 
-    for (let row = 0; row < rows; row++) {
-        gridArray.push([]);
+    addNeighbours() {
+        // Top
+        if (this.x > 0) {
+            this.neighbours.push([this.x - 1, this.y]);
+        }
 
-        for (let col = 0; col < cols; col++) {
-            const node = document.createElement('div');
-            node.classList.add('node');
-            grid.appendChild(node);
-            gridArray[row].push(new Node(node));
+        // Bottom
+        if (this.x < ROWS - 1) {
+            this.neighbours.push([this.x + 1, this.y]);
+        }
+
+        // Left
+        if (this.y > 0) {
+            this.neighbours.push([this.x, this.y - 1]);
+        }
+
+        // Right
+        if (this.y < COLS - 1) {
+            this.neighbours.push([this.x, this.y + 1]);
+        }
+    }
+
+    addClickEvent() {
+        this.element.addEventListener('click', () => {
+            if (startNode.join() == [].join()) {
+               this.makeStartNode();
+            } else if (finishNode.join() == [].join() && this.start === false) {
+                this.makeFinishNode();
+            } else if (this.start === false && this.finish === false) {
+                if (this.wall) {
+                    this.removeWall();
+                } else {
+                    this.makeWall();
+                }
+            }
+        });
+    }
+
+    addMouseEnterEvent() {
+        this.element.addEventListener('mouseenter', (event) => {
+            if (event.buttons === 1) {
+                if (startNode.join() != [].join() && finishNode.join() != [].join() && this.start === false && this.finish === false) {
+                    if (!this.wall) {
+                        this.makeWall();
+                    } else {
+                        this.removeWall();
+                    }
+                }
+            }
+        });
+    }
+
+    makeStartNode() {
+        startNode = [this.x, this.y];
+        this.start = true;
+        this.element.classList.add('cell-start'); 
+    }
+
+    makeFinishNode() {
+        finishNode = [this.x, this.y];
+        this.finish = true;
+        this.element.classList.add('cell-finish');   
+    }
+
+    makeWall() {
+        this.wall = true;
+        this.element.classList.add('cell-wall');
+    }
+
+    removeWall() {
+        this.wall = false;
+        this.element.classList.remove('cell-wall');
+    }
+
+    visit() {
+        for (let i = 0; i < this.neighbours.length; i++) {
+            let [x, y] = this.neighbours[i];
+            grid[x][y].element.classList.add('cell-visited');
         }
     }
 }
 
-makeGrid(NUM_OF_ROWS, NUM_OF_COLS);
+function setup(rows, cols) {
+    container.style.setProperty('--grid-rows', rows);
+    container.style.setProperty('--grid-cols', cols);
+
+    for (let row = 0; row < rows; row++) {
+        grid.push([]);
+
+        for (let col = 0; col < cols; col++) {
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+            container.appendChild(cell);
+            grid[row].push(new Cell(cell, row, col));
+        }
+    }
+}
+
+function debug() {
+    grid[startNode[0]][startNode[1]].visit();
+}
+
+setup(ROWS, COLS);
