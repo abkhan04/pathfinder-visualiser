@@ -46,9 +46,9 @@ class Cell {
 
     addClickEvent() {
         this.element.addEventListener('click', () => {
-            if (startNode.join() == [].join()) {
+            if (compareArray(startNode, [])) {
                this.makeStartNode();
-            } else if (finishNode.join() == [].join() && this.start === false) {
+            } else if (compareArray(finishNode, []) && this.start === false) {
                 this.makeFinishNode();
             } else if (this.start === false && this.finish === false) {
                 if (this.wall) {
@@ -63,7 +63,7 @@ class Cell {
     addMouseEnterEvent() {
         this.element.addEventListener('mouseenter', (event) => {
             if (event.buttons === 1) {
-                if (startNode.join() != [].join() && finishNode.join() != [].join() && this.start === false && this.finish === false) {
+                if (!compareArray(startNode, []) && !compareArray(finishNode, []) && this.start === false && this.finish === false) {
                     if (!this.wall) {
                         this.makeWall();
                     } else {
@@ -102,6 +102,10 @@ class Cell {
             grid[x][y].element.classList.add('cell-visited');
         }
     }
+}
+
+function compareArray(a, b) {
+    return a.join() === b.join();
 }
 
 function setup(rows, cols) {
