@@ -48,9 +48,9 @@ class Cell {
         this.element.addEventListener('click', () => {
             if (compareArray(startNode, [])) {
                this.makeStartNode();
-            } else if (compareArray(finishNode, []) && this.start === false) {
+            } else if (compareArray(finishNode, []) && !this.start) {
                 this.makeFinishNode();
-            } else if (this.start === false && this.finish === false) {
+            } else if (!this.start && !this.finish) {
                 if (this.wall) {
                     this.removeWall();
                 } else {
@@ -63,7 +63,7 @@ class Cell {
     addMouseEnterEvent() {
         this.element.addEventListener('mouseenter', (event) => {
             if (event.buttons === 1) {
-                if (!compareArray(startNode, []) && !compareArray(finishNode, []) && this.start === false && this.finish === false) {
+                if (!compareArray(startNode, []) && !compareArray(finishNode, []) && !this.start && !this.finish) {
                     if (!this.wall) {
                         this.makeWall();
                     } else {
