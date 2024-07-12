@@ -1,11 +1,10 @@
 const container = document.getElementById('container');
 let grid = [];
+let startNode = [];
+let finishNode = [];
 
 const ROWS = 10;
 const COLS = 10;
-
-let startNode = [];
-let finishNode = [];
 
 class Cell {
     constructor(element, x, y) {
@@ -97,6 +96,11 @@ class Cell {
     }
 
     visit() {
+        this.visited = true;
+        this.element.classList.add('cell-visited');
+    }
+
+    visitNeighbours() {
         for (let i = 0; i < this.neighbours.length; i++) {
             let [x, y] = this.neighbours[i];
             grid[x][y].element.classList.add('cell-visited');
@@ -126,6 +130,35 @@ function setup(rows, cols) {
 
 function debug() {
     grid[startNode[0]][startNode[1]].visit();
+}
+
+function bfs() {
+    let node = grid[startNode[0]][startNode[1]];
+    let stack = [node];
+    let found = false;
+
+    while (!found) {
+        for (let i = 0; i < stack.length; i++) {
+            for (let j = 0; j < stack[i].neighbours.length; j++) {
+                let cell = grid[stack[i].neighbours[j][0]][stack[i].neighbours[j][1]];
+
+                if (cell.finish) {
+                    found = true;
+                } else if (!cell.start && !cell.finish && !cell.visited) {
+                    stack.push(cell);
+                    cell.visit();
+                }
+            }
+
+            if (found) {
+                break;
+            }
+        }
+
+        if (found) {
+            break;
+        }
+    }
 }
 
 setup(ROWS, COLS);
