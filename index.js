@@ -1,7 +1,7 @@
 const container = document.getElementById('container');
 let grid = [];
-let startNode = [];
-let finishNode = [];
+let startNode = null;
+let finishNode = null;
 
 const ROWS = 10;
 const COLS = 10;
@@ -12,7 +12,6 @@ class Cell {
         this.x = x;
         this.y = y;
         this.neighbours = [];
-        this.addNeighbours();
         this.start = false;
         this.finish = false;
         this.wall = false;
@@ -21,33 +20,37 @@ class Cell {
         this.addMouseEnterEvent();
     }
 
-    addNeighbours() {
-        // Top
-        if (this.x > 0) {
-            this.neighbours.push([this.x - 1, this.y]);
+    getNeighbours() {
+        if (compareArray(this.neighbours, [])) {
+            // Top
+            if (this.x > 0) {
+                this.neighbours.push(grid[this.x - 1][this.y]);
+            }
+
+            // Bottom
+            if (this.x < ROWS - 1) {
+                this.neighbours.push(grid[this.x + 1][this.y]);
+            }
+
+            // Left
+            if (this.y > 0) {
+                this.neighbours.push(grid[this.x][this.y - 1]);
+            }
+
+            // Right
+            if (this.y < COLS - 1) {
+                this.neighbours.push(grid[this.x][this.y + 1]);
+            }
         }
 
-        // Bottom
-        if (this.x < ROWS - 1) {
-            this.neighbours.push([this.x + 1, this.y]);
-        }
-
-        // Left
-        if (this.y > 0) {
-            this.neighbours.push([this.x, this.y - 1]);
-        }
-
-        // Right
-        if (this.y < COLS - 1) {
-            this.neighbours.push([this.x, this.y + 1]);
-        }
+        return this.neighbours;
     }
 
     addClickEvent() {
         this.element.addEventListener('click', () => {
-            if (compareArray(startNode, [])) {
+            if (!startNode) {
                this.makeStartNode();
-            } else if (compareArray(finishNode, []) && !this.start) {
+            } else if (!finishNode && !this.start) {
                 this.makeFinishNode();
             } else if (!this.start && !this.finish) {
                 if (this.wall) {
@@ -62,7 +65,7 @@ class Cell {
     addMouseEnterEvent() {
         this.element.addEventListener('mouseenter', (event) => {
             if (event.buttons === 1) {
-                if (!compareArray(startNode, []) && !compareArray(finishNode, []) && !this.start && !this.finish) {
+                if (startNode && finishNode && !this.start && !this.finish) {
                     if (!this.wall) {
                         this.makeWall();
                     } else {
@@ -74,13 +77,13 @@ class Cell {
     }
 
     makeStartNode() {
-        startNode = [this.x, this.y];
+        startNode = this;
         this.start = true;
         this.element.classList.add('cell-start'); 
     }
 
     makeFinishNode() {
-        finishNode = [this.x, this.y];
+        finishNode = this;
         this.finish = true;
         this.element.classList.add('cell-finish');   
     }
@@ -98,13 +101,6 @@ class Cell {
     visit() {
         this.visited = true;
         this.element.classList.add('cell-visited');
-    }
-
-    visitNeighbours() {
-        for (let i = 0; i < this.neighbours.length; i++) {
-            let [x, y] = this.neighbours[i];
-            grid[x][y].element.classList.add('cell-visited');
-        }
     }
 }
 
@@ -128,19 +124,18 @@ function setup(rows, cols) {
     }
 }
 
-function debug() {
-    grid[startNode[0]][startNode[1]].visit();
+function heuristic(cell) {
+    return Math.abs(cell.x - finishNode.x) + Math.abs(cell.y - finishNode.y);
 }
 
 function bfs() {
-    let node = grid[startNode[0]][startNode[1]];
-    let stack = [node];
+    let stack = [startNode];
     let found = false;
 
     while (!found) {
         for (let i = 0; i < stack.length; i++) {
-            for (let j = 0; j < stack[i].neighbours.length; j++) {
-                let cell = grid[stack[i].neighbours[j][0]][stack[i].neighbours[j][1]];
+            for (let j = 0; j < stack[i].getNeighbours().length; j++) {
+                let cell = stack[i].getNeighbours()[j];
 
                 if (cell.finish) {
                     found = true;
