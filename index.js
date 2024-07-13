@@ -7,43 +7,17 @@ const ROWS = 10;
 const COLS = 10;
 
 class Cell {
-    constructor(element, x, y) {
+    constructor(element, row, col) {
         this.element = element;
-        this.x = x;
-        this.y = y;
-        this.neighbours = [];
+        this.row = row;
+        this.col = col;
         this.start = false;
         this.finish = false;
         this.wall = false;
         this.visited = false;
+        this.distance = Infinity;
         this.addClickEvent();
         this.addMouseEnterEvent();
-    }
-
-    getNeighbours() {
-        if (compareArray(this.neighbours, [])) {
-            // Top
-            if (this.x > 0) {
-                this.neighbours.push(grid[this.x - 1][this.y]);
-            }
-
-            // Bottom
-            if (this.x < ROWS - 1) {
-                this.neighbours.push(grid[this.x + 1][this.y]);
-            }
-
-            // Left
-            if (this.y > 0) {
-                this.neighbours.push(grid[this.x][this.y - 1]);
-            }
-
-            // Right
-            if (this.y < COLS - 1) {
-                this.neighbours.push(grid[this.x][this.y + 1]);
-            }
-        }
-
-        return this.neighbours;
     }
 
     addClickEvent() {
@@ -99,13 +73,77 @@ class Cell {
     }
 
     visit() {
-        this.visited = true;
-        this.element.classList.add('cell-visited');
+        if (!this.start && !this.finish && !this.wall) {
+            this.visited = true;
+            this.element.classList.add('cell-visited');
+        }
     }
+}
+
+function getNeighbours(cell) {
+    let neighbours = []
+
+    // Top
+    if (cell.row > 0) {
+        neighbours.push(grid[cell.row - 1][cell.col]);
+    }
+
+    // Bottom
+    if (cell.row < ROWS - 1) {
+        neighbours.push(grid[cell.row + 1][cell.col]);
+    }
+
+    // Left
+    if (cell.col > 0) {
+        neighbours.push(grid[cell.row][cell.col - 1]);
+    }
+
+    // Right
+    if (cell.col < COLS - 1) {
+        neighbours.push(grid[cell.row][cell.col + 1]);
+    }
+
+    return neighbours;
+}
+
+function heuristic(cell) {
+    return Math.abs(cell.row - finishNode.row) + Math.abs(cell.col - finishNode.col);
 }
 
 function compareArray(a, b) {
     return a.join() === b.join();
+}
+
+function aStar() {
+    let openList = [startNode];
+    startNode.distance = 0;
+
+    while (openList) {
+        let currNode = openList[0];
+
+        for (let i = 1; i < openList.length; i++) {
+            if (openList[i].distance < currNode.distance) {
+                currNode = openList[i];
+            }
+        }
+
+        currNode.visit();
+        openList.splice(openList.indexOf(currNode), 1);
+
+        if (currNode.finish) {
+            return;
+        }
+
+        for (let neighbour of getNeighbours(currNode)) {
+            neighbour.distance = currNode.distance + 1 + heuristic(neighbour);
+
+            if (!neighbour.start && !neighbour.visited && !neighbour.wall) {
+                openList.push(neighbour);
+            }
+        }
+
+        console.log(currNode);
+    }
 }
 
 function setup(rows, cols) {
@@ -124,10 +162,6 @@ function setup(rows, cols) {
     }
 }
 
-function heuristic(cell) {
-    return Math.abs(cell.x - finishNode.x) + Math.abs(cell.y - finishNode.y);
-}
-
 function bfs() {
     let stack = [startNode];
     let found = false;
@@ -139,6 +173,7 @@ function bfs() {
 
                 if (cell.finish) {
                     found = true;
+                    return;
                 } else if (!cell.start && !cell.finish && !cell.visited) {
                     stack.push(cell);
                     cell.visit();
