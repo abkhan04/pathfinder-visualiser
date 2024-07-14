@@ -15,7 +15,10 @@ class Cell {
         this.finish = false;
         this.wall = false;
         this.visited = false;
-        this.distance = Infinity;
+        this.f = 0;
+        this.g = 0;
+        this.h = 0;
+        this.previous = null;
         this.addClickEvent();
         this.addMouseEnterEvent();
     }
@@ -116,33 +119,49 @@ function compareArray(a, b) {
 
 function aStar() {
     let openList = [startNode];
-    startNode.distance = 0;
 
     while (openList) {
         let currNode = openList[0];
 
-        for (let i = 1; i < openList.length; i++) {
-            if (openList[i].distance < currNode.distance) {
+        for (let i = 0; i < openList.length; i++) {
+            if (openList[i].f < currNode.f) {
                 currNode = openList[i];
             }
         }
-
-        currNode.visit();
-        openList.splice(openList.indexOf(currNode), 1);
 
         if (currNode.finish) {
             return;
         }
 
-        for (let neighbour of getNeighbours(currNode)) {
-            neighbour.distance = currNode.distance + 1 + heuristic(neighbour);
+        openList.splice(openList.indexOf(currNode), 1);
+        currNode.visit();
+
+        const neighbours = getNeighbours(currNode);
+
+        for (let i = 0; i < neighbours.length; i++) {
+            const neighbour = neighbours[i];
 
             if (!neighbour.start && !neighbour.visited && !neighbour.wall) {
+                const tempG = currNode.g + 1;
+
+                if (openList.includes(neighbour)) {
+                    if (tempG < neighbour.g) {
+                        neighbour.g = tempG;
+                        neighbour.h = heuristic(neighbour, finishNode);
+                        neighbour.f = neighbour.g + neighbour.h;
+                        this.previous = currNode;
+                    }
+                } else {
+                    neighbour.g = tempG;
+                    neighbour.h = heuristic(neighbour, finishNode);
+                    neighbour.f = neighbour.g + neighbour.h;
+                    this.previous = currNode;
+                    openList.push(neighbour);
+                }
+
                 openList.push(neighbour);
             }
         }
-
-        console.log(currNode);
     }
 }
 
