@@ -3,6 +3,8 @@ let grid = [];
 let startNode = null;
 let finishNode = null;
 
+let shortestPathFound = false;  // Stop multiple searches on the same grid
+
 const ROWS = 10;
 const COLS = 10;
 
@@ -113,12 +115,12 @@ function heuristic(cell) {
     return Math.abs(cell.row - finishNode.row) + Math.abs(cell.col - finishNode.col);
 }
 
-function compareArray(a, b) {
-    return a.join() === b.join();
-}
+function astar(start) {
+    if (shortestPathFound) {
+        return;
+    }
 
-function aStar() {
-    let openList = [startNode];
+    let openList = [start];
 
     while (openList) {
         let currNode = openList[0];
@@ -130,6 +132,7 @@ function aStar() {
         }
 
         if (currNode.finish) {
+            shortestPathFound = true;
             return;
         }
 
@@ -158,8 +161,6 @@ function aStar() {
                     this.previous = currNode;
                     openList.push(neighbour);
                 }
-
-                openList.push(neighbour);
             }
         }
     }
@@ -181,33 +182,27 @@ function setup(rows, cols) {
     }
 }
 
-function bfs() {
-    let stack = [startNode];
-    let found = false;
+function reset() {
+    // Remove all child components from grid
+    let child = container.lastElementChild;
 
-    while (!found) {
-        for (let i = 0; i < stack.length; i++) {
-            for (let j = 0; j < stack[i].getNeighbours().length; j++) {
-                let cell = stack[i].getNeighbours()[j];
-
-                if (cell.finish) {
-                    found = true;
-                    return;
-                } else if (!cell.start && !cell.finish && !cell.visited) {
-                    stack.push(cell);
-                    cell.visit();
-                }
-            }
-
-            if (found) {
-                break;
-            }
-        }
-
-        if (found) {
-            break;
-        }
+    while (child) {
+        container.removeChild(child);
+        child = container.lastElementChild;
     }
+
+    // Reset grid
+    grid = [];
+
+    // Reset nodes
+    startNode = null;
+    finishNode = null;
+
+    // Reset algorithm calculations
+    shortestPathFound = false;
+
+    // Setup
+    setup(ROWS, COLS)
 }
 
-setup(ROWS, COLS);
+reset();
