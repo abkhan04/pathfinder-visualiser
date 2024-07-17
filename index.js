@@ -5,8 +5,8 @@ let finishNode = null;
 
 let shortestPathFound = false;  // Stop multiple searches on the same grid
 
-const ROWS = 10;
-const COLS = 10;
+const ROWS = 20;
+const COLS = 40;
 
 class Cell {
     constructor(element, row, col) {
