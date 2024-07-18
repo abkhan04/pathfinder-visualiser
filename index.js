@@ -83,30 +83,29 @@ class Cell {
             this.element.classList.add('cell-visited');
         }
     }
+
+    setShortestPath() {
+        if (!this.start && !this.finish && !this.wall) {
+            this.element.classList.remove('cell-visited');
+            this.element.classList.add('cell-shortest-path');
+        }
+    }
 }
 
 function getNeighbours(cell) {
     let neighbours = []
 
     // Top
-    if (cell.row > 0) {
-        neighbours.push(grid[cell.row - 1][cell.col]);
-    }
+    if (cell.row > 0) neighbours.push(grid[cell.row - 1][cell.col]);
 
     // Bottom
-    if (cell.row < ROWS - 1) {
-        neighbours.push(grid[cell.row + 1][cell.col]);
-    }
+    if (cell.row < ROWS - 1) neighbours.push(grid[cell.row + 1][cell.col]);
 
     // Left
-    if (cell.col > 0) {
-        neighbours.push(grid[cell.row][cell.col - 1]);
-    }
+    if (cell.col > 0) neighbours.push(grid[cell.row][cell.col - 1]);
 
     // Right
-    if (cell.col < COLS - 1) {
-        neighbours.push(grid[cell.row][cell.col + 1]);
-    }
+    if (cell.col < COLS - 1) neighbours.push(grid[cell.row][cell.col + 1]);
 
     return neighbours;
 }
@@ -121,9 +120,10 @@ function astar(start) {
     }
 
     let openList = [start];
+    let currNode;
 
     while (openList) {
-        let currNode = openList[0];
+        currNode = openList[0]
 
         for (let i = 0; i < openList.length; i++) {
             if (openList[i].f < currNode.f) {
@@ -133,7 +133,7 @@ function astar(start) {
 
         if (currNode.finish) {
             shortestPathFound = true;
-            return;
+            break;
         }
 
         openList.splice(openList.indexOf(currNode), 1);
@@ -152,17 +152,28 @@ function astar(start) {
                         neighbour.g = tempG;
                         neighbour.h = heuristic(neighbour, finishNode);
                         neighbour.f = neighbour.g + neighbour.h;
-                        this.previous = currNode;
+                        neighbour.previous = currNode;
                     }
                 } else {
                     neighbour.g = tempG;
                     neighbour.h = heuristic(neighbour, finishNode);
                     neighbour.f = neighbour.g + neighbour.h;
-                    this.previous = currNode;
+                    neighbour.previous = currNode;
                     openList.push(neighbour);
                 }
             }
         }
+    }
+
+    setTimeout(showShortestPath, 1500);
+}
+
+function showShortestPath() {
+    let temp = finishNode;
+
+    while (temp.previous) {
+        temp.setShortestPath();
+        temp = temp.previous;
     }
 }
 
